@@ -5,7 +5,6 @@
 #include <gtest/gtest.h>
 #include <sstream>
 #include "../Classes/CMyArray.hpp"
-#include "../Classes/CMyArrayIterator.hpp"
 
 TEST(CMyArrayDoubleTest, CreatingDefault) {
     CMyArray<double> arr;

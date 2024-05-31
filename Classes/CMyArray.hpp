@@ -100,6 +100,7 @@ public:
         }
         return m_data[index];
     };
+
     const T& operator[](size_t index) const
     {
         if (index >= m_size)
@@ -119,7 +120,7 @@ public:
         m_count++;
     }
 
-    
+
     CMyArray& operator=(const CMyArray& other)
     {
         if (std::addressof(other) == this)

@@ -13,6 +13,7 @@ class CMyArrayException : public std::invalid_argument
 public:
     static CMyArrayException OutOfBoundsException();
     static CMyArrayException InvalidNewCapacityException();
+
 private:
     explicit CMyArrayException(std::string const& message);
 };
