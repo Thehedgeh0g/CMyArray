@@ -1,0 +1,4 @@
+/bin/
+/cmake-build-debug/
+*.clang_format
+/.idea/
