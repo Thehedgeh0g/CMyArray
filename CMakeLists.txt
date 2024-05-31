@@ -15,13 +15,10 @@ FetchContent_MakeAvailable(googletest)
 
 add_executable(${PROJECT_NAME}Test
         Test/Tests.cpp
-        Classes/CMyArray.cpp
-        Classes/CMyArray.h
-        Classes/CMyArray.cpp
+        Classes/CMyArray.hpp
         Classes/CMyArrayException.cpp
         Classes/CMyArrayException.h
-        Classes/CMyArrayIterator.cpp
-        Classes/CMyArrayIterator.h
+        Classes/CMyArrayIterator.hpp
 )
 
 target_link_libraries(${PROJECT_NAME}Test gtest_main)
@@ -29,11 +26,8 @@ enable_testing()
 add_test(NAME ${PROJECT_NAME}Test COMMAND ${PROJECT_NAME}Test)
 
 add_executable(${PROJECT_NAME} main.cpp
-        Classes/CMyArray.cpp
-        Classes/CMyArray.h
-        Classes/CMyArray.cpp
+        Classes/CMyArray.hpp
         Classes/CMyArrayException.cpp
         Classes/CMyArrayException.h
-        Classes/CMyArrayIterator.cpp
-        Classes/CMyArrayIterator.h
+        Classes/CMyArrayIterator.hpp
 )

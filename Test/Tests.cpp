@@ -4,161 +4,250 @@
 
 #include <gtest/gtest.h>
 #include <sstream>
-#include "../Classes/CMyArray.h"
-#include "../Classes/CMyArrayIterator.h"
+#include "../Classes/CMyArray.hpp"
+#include "../Classes/CMyArrayIterator.hpp"
 
-TEST(CMyArrayTest, DefaultConstructor) {
-    CMyArray<int> myArray;
-    EXPECT_EQ(myArray.Size(), 1);
-    EXPECT_EQ(myArray.Count(), 0);
+TEST(CMyArrayDoubleTest, CreatingDefault) {
+    CMyArray<double> arr;
+    EXPECT_EQ(arr.Count(), 0);
+    EXPECT_EQ(arr.Size(), 1);
 }
 
-// Test size and count after resizing
-TEST(CMyArrayTest, Resize) {
-    CMyArray<int> myArray;
-    myArray.Resize(10);
-    EXPECT_EQ(myArray.Size(), 10);
-    EXPECT_EQ(myArray.Count(), 5); // Resizing doesn't change count
+TEST(CMyArrayDoubleTest, AddingElements) {
+    CMyArray<double> arr;
+    arr.pushBack(5);
+    arr.pushBack(5.2222);
+    arr.pushBack(100.222);
+    arr.pushBack(220);
 
-    myArray.Resize(3);
-    EXPECT_EQ(myArray.Size(), 3);
-    EXPECT_EQ(myArray.Count(), 3); // Count should be reduced after resizing
+    EXPECT_EQ(arr.Count(), 4);
+    EXPECT_EQ(arr.Size(), 8);
+    EXPECT_EQ(arr[0], 5);
+    EXPECT_EQ(arr[1], 5.2222);
+    EXPECT_EQ(arr[2], 100.222);
+    EXPECT_EQ(arr[3], 220);
 }
 
-// Test clearing the array
-TEST(CMyArrayTest, Clear) {
-    CMyArray<int> myArray;
-    myArray.Clear();
-    EXPECT_EQ(myArray.Size(), 1);
-    EXPECT_EQ(myArray.Count(), 0);
+TEST(CMyArrayDoubleTest, OutOfBoundsAccess) {
+    CMyArray<double> arr;
+    arr.pushBack(5);
+    arr.pushBack(5.2222);
+    arr.pushBack(100.222);
+
+    EXPECT_THROW(arr[10], CMyArrayException);
 }
 
-// Test iterator functionality
-TEST(CMyArrayTest, Iterator) {
-    // Test forward iteration
-    CMyArray<int> myArray;
-    int expectedValue = 0;
-    for (auto it = myArray.begin(); it != myArray.end(); ++it) {
-        EXPECT_EQ(*it, expectedValue++);
+TEST(CMyArrayDoubleTest, ModifyElement) {
+    CMyArray<double> arr;
+    arr.pushBack(5);
+    arr.pushBack(5.2222);
+    arr.pushBack(100.222);
+    arr[2] = 10.001;
+
+    EXPECT_EQ(arr[2], 10.001);
+}
+
+TEST(CMyArrayDoubleTest, SumElements) {
+    CMyArray<double> arr;
+    double digit1 = 5;
+    double digit2 = 5.2222;
+    double digit3 = 100.222;
+    arr.pushBack(digit1);
+    arr.pushBack(digit2);
+    arr.pushBack(digit3);
+
+    double expectedSum = digit1 + digit2 + digit3;
+    double generalSum = 0;
+    for (const double value : arr) {
+        generalSum += value;
     }
 
-    // Test reverse iteration
-    expectedValue = 4;
-    for (auto it = myArray.rbegin(); it != myArray.rend(); ++it) {
-        EXPECT_EQ(*it, expectedValue--);
-    }
-
-    // Test dereferencing and indexing
-    auto it = myArray.begin();
-    EXPECT_EQ(*it, 0);
-    EXPECT_EQ(it[2], 2);
-
-    // Test arithmetic operations
-    it += 2;
-    EXPECT_EQ(*it, 2);
-    it -= 1;
-    EXPECT_EQ(*it, 1);
-    auto it2 = it + 2;
-    EXPECT_EQ(*it2, 3);
-    auto it3 = it2 - 2;
-    EXPECT_EQ(*it3, 1);
-    EXPECT_EQ(*it2 - *it, 2);
-    EXPECT_EQ(it2 - 2, it);
-    EXPECT_EQ(2 + it, it2);
-    EXPECT_EQ(it - 2, it3);
-
-    // Test comparison operators
-    EXPECT_TRUE(it == it3 + 1);
-    EXPECT_TRUE(it != it2);
-    EXPECT_TRUE(it < it2);
-    EXPECT_TRUE(it <= it2);
-    EXPECT_TRUE(it2 > it);
-    EXPECT_TRUE(it2 >= it);
+    EXPECT_EQ(expectedSum, generalSum);
 }
 
-// Test copy constructor
-TEST(CMyArrayTest, CopyConstructor) {
-    CMyArray<int> myArray1;
-    myArray1.Resize(3);
-    myArray1[0] = 1;
-    myArray1[1] = 2;
-    myArray1[2] = 3;
+TEST(CMyArrayStringTest, AddingElements) {
+    CMyArray<std::string> arr;
+    arr.pushBack("Some");
+    arr.pushBack("text");
+    arr.pushBack("!!!!");
 
-    CMyArray<int> myArray2(myArray1);
-    EXPECT_EQ(myArray2.Size(), 3);
-    EXPECT_EQ(myArray2.Count(), 3);
-    EXPECT_EQ(myArray2[0], 1);
-    EXPECT_EQ(myArray2[1], 2);
-    EXPECT_EQ(myArray2[2], 3);
+    EXPECT_EQ(arr[0], "Some");
+    EXPECT_EQ(arr[1], "text");
+    EXPECT_EQ(arr[2], "!!!!");
 }
 
-// Test move constructor
-TEST(CMyArrayTest, MoveConstructor) {
-    CMyArray<int> myArray1;
-    myArray1.Resize(3);
-    myArray1[0] = 1;
-    myArray1[1] = 2;
-    myArray1[2] = 3;
+TEST(CMyArrayStringTest, CopyToVector) {
+    CMyArray<std::string> arr;
+    std::vector<std::string> vector;
+    arr.pushBack("Some");
+    arr.pushBack("text");
+    arr.pushBack("!!!!");
+    std::copy(arr.begin(), arr.end(), std::back_inserter(vector));
 
-    CMyArray<int> myArray2(std::move(myArray1));
-    EXPECT_EQ(myArray2.Size(), 3);
-    EXPECT_EQ(myArray2.Count(), 3);
-    EXPECT_EQ(myArray2[0], 1);
-    EXPECT_EQ(myArray2[1], 2);
-    EXPECT_EQ(myArray2[2], 3);
-
-    // After move, original array should be in valid but unspecified state
-    EXPECT_EQ(myArray1.Size(), 1);
-    EXPECT_EQ(myArray1.Count(), 0);
+    EXPECT_EQ(vector[0], "Some");
+    EXPECT_EQ(vector[1], "text");
+    EXPECT_EQ(vector[2], "!!!!");
 }
 
-// Test assignment operator
-TEST(CMyArrayTest, AssignmentOperator) {
-    CMyArray<int> myArray1;
-    myArray1.Resize(3);
-    myArray1[0] = 1;
-    myArray1[1] = 2;
-    myArray1[2] = 3;
+TEST(CMyArrayStringTest, ReverseCopyToVector) {
+    CMyArray<std::string> arr;
+    std::vector<std::string> vector;
+    arr.pushBack("Some");
+    arr.pushBack("text");
+    arr.pushBack("!!!!");
+    std::copy(arr.rbegin(), arr.rend(), std::back_inserter(vector));
 
-    CMyArray<int> myArray2;
-    myArray2 = myArray1;
-    EXPECT_EQ(myArray2.Size(), 3);
-    EXPECT_EQ(myArray2.Count(), 3);
-    EXPECT_EQ(myArray2[0], 1);
-    EXPECT_EQ(myArray2[1], 2);
-    EXPECT_EQ(myArray2[2], 3);
+    EXPECT_EQ(vector[0], "!!!!");
+    EXPECT_EQ(vector[1], "text");
+    EXPECT_EQ(vector[2], "Some");
 }
 
-// Test move assignment operator
-TEST(CMyArrayTest, MoveAssignmentOperator) {
-    CMyArray<int> myArray1;
-    myArray1.Resize(3);
-    myArray1[0] = 1;
-    myArray1[1] = 2;
-    myArray1[2] = 3;
+TEST(CMyArrayCopyTest, CopyConstructor) {
+    CMyArray<std::string> arr1;
+    arr1.pushBack("Some");
+    arr1.pushBack("text");
+    CMyArray<std::string> arr2(arr1);
+    arr2[0] = "New";
+    arr2.pushBack("!!!");
 
-    CMyArray<int> myArray2;
-    myArray2 = std::move(myArray1);
-    EXPECT_EQ(myArray2.Size(), 3);
-    EXPECT_EQ(myArray2.Count(), 3);
-    EXPECT_EQ(myArray2[0], 1);
-    EXPECT_EQ(myArray2[1], 2);
-    EXPECT_EQ(myArray2[2], 3);
-
-    // After move assignment, original array should be in valid but unspecified state
-    EXPECT_EQ(myArray1.Size(), 1);
-    EXPECT_EQ(myArray1.Count(), 0);
+    EXPECT_EQ(arr1[0], "Some");
+    EXPECT_EQ(arr2[0], "New");
+    EXPECT_EQ(arr2[1], "text");
+    EXPECT_EQ(arr2[2], "!!!");
+    EXPECT_EQ(arr2.Count() - arr1.Count(), 1);
 }
 
-// Test out of bounds exception in iterator indexing
-TEST(CMyArrayTest, IteratorOutOfBoundsException) {
-    CMyArray<int> myArray;
-    auto it = myArray.begin();
-    ASSERT_NO_THROW(it[0]);
-    ASSERT_NO_THROW(it[4]);
+TEST(CMyArrayCopyTest, CopyAssignmentOperator) {
+    CMyArray<std::string> arr1;
+    arr1.pushBack("Some");
+    arr1.pushBack("text");
+    CMyArray<std::string> arr2 = arr1;
+    arr2[0] = "New";
+    arr2.pushBack("!!!");
 
-    ASSERT_ANY_THROW(it[-1]);
-    ASSERT_ANY_THROW(it[5]);
+    EXPECT_EQ(arr1[0], "Some");
+    EXPECT_EQ(arr2[0], "New");
+    EXPECT_EQ(arr2[1], "text");
+    EXPECT_EQ(arr2[2], "!!!");
+    EXPECT_EQ(arr2.Count() - arr1.Count(), 1);
+}
+
+TEST(CMyArrayCopyTest, SelfAssignment) {
+    CMyArray<double> arr1;
+    arr1.pushBack(2.001);
+    arr1.pushBack(10.012);
+    arr1 = arr1;
+
+    EXPECT_EQ(arr1.Count(), 2);
+    EXPECT_EQ(arr1[0], 2.001);
+    EXPECT_EQ(arr1[1], 10.012);
+}
+
+TEST(CMyArrayMoveTest, MoveConstructor) {
+    CMyArray<double> arr1;
+    arr1.pushBack(2.001);
+    arr1.pushBack(10.012);
+    CMyArray<double> arr2(std::move(arr1));
+
+    EXPECT_EQ(arr1.Count(), 0);
+    EXPECT_EQ(arr2[0], 2.001);
+    EXPECT_EQ(arr2[1], 10.012);
+}
+
+TEST(CMyArrayMoveTest, MoveAssignmentOperator) {
+    CMyArray<double> arr1;
+    arr1.pushBack(2.001);
+    arr1.pushBack(10.012);
+    CMyArray<double> arr2 = std::move(arr1);
+
+    EXPECT_EQ(arr1.Count(), 0);
+    EXPECT_EQ(arr2[0], 2.001);
+    EXPECT_EQ(arr2[1], 10.012);
+}
+
+TEST(CMyArrayMoveTest, SelfMoveAssignment) {
+    CMyArray<double> arr1;
+    arr1.pushBack(2.001);
+    arr1.pushBack(10.012);
+    arr1 = std::move(arr1);
+
+    EXPECT_EQ(arr1.Count(), 2);
+    EXPECT_EQ(arr1[0], 2.001);
+    EXPECT_EQ(arr1[1], 10.012);
+}
+
+TEST(CMyArrayClearTest, ClearEmptyArray) {
+    CMyArray<double> arr;
+    EXPECT_EQ(arr.Count(), 0);
+    arr.Clear();
+    EXPECT_EQ(arr.Count(), 0);
+}
+
+TEST(CMyArrayClearTest, ClearNonEmptyArray) {
+    CMyArray<double> arr;
+    arr.pushBack(5.002);
+    arr.pushBack(0);
+    arr.pushBack(-19);
+    EXPECT_EQ(arr.Count(), 3);
+    arr.Clear();
+    EXPECT_EQ(arr.Count(), 0);
+}
+
+TEST(CMyArrayResizeTest, ResizeSameCapacity) {
+    CMyArray<double> arr;
+    arr.pushBack(5);
+    arr.pushBack(0);
+    arr.pushBack(1);
+    EXPECT_EQ(arr.Size(), 4);
+    arr.Resize(4);
+    EXPECT_EQ(arr.Size(), 4);
+}
+
+TEST(CMyArrayResizeTest, ResizeLargerCapacity) {
+    CMyArray<double> arr;
+    arr.pushBack(5);
+    arr.pushBack(0);
+    arr.pushBack(1);
+    EXPECT_EQ(arr.Size(), 4);
+    arr.Resize(10);
+    EXPECT_EQ(arr.Size(), 10);
+}
+
+TEST(CMyArrayResizeTest, ResizeSmallerCapacityButGreaterThanCount) {
+    CMyArray<double> arr;
+    arr.pushBack(5);
+    arr.pushBack(0);
+    arr.pushBack(1);
+    arr.pushBack(1);
+    EXPECT_EQ(arr.Size(), 8);
+    arr.Resize(6);
+    EXPECT_EQ(arr.Size(), 6);
+}
+
+TEST(CMyArrayResizeTest, ResizeEqualToCount) {
+    CMyArray<double> arr;
+    arr.pushBack(5);
+    arr.pushBack(0);
+    arr.pushBack(1);
+    arr.pushBack(1);
+    EXPECT_EQ(arr.Size(), 8);
+    arr.Resize(4);
+    EXPECT_EQ(arr.Size(), 4);
+    std::vector<double> vector;
+    std::copy(arr.begin(), arr.end(), std::back_inserter(vector));
+    EXPECT_EQ(vector[0], 5);
+    EXPECT_EQ(vector[1], 0);
+    EXPECT_EQ(vector[2], 1);
+    EXPECT_EQ(vector[3], 1);
+}
+
+TEST(CMyArrayResizeTest, ResizeSmallerThanCount) {
+    CMyArray<double> arr;
+    arr.pushBack(5);
+    arr.pushBack(0);
+    arr.pushBack(1);
+    arr.pushBack(1);
+    EXPECT_THROW(arr.Resize(2), std::invalid_argument);
 }
 
 int main(int argc, char **argv)
